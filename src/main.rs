@@ -93,7 +93,7 @@ impl Philosopher {
 }
 // SUB FUNCTIONS
 //--------------------------------------------------------------------------------------------
-fn reader(cs_lk: Arc<Mutex<Chopstick>>) -> usize {
+fn reader(cs_lk: &Arc<Mutex<Chopstick>>) -> usize {
     // pass in protected chopstick, return count
     let mut cs = cs_lk.lock().unwrap();
     let count = cs.read();
@@ -114,8 +114,13 @@ fn main() {
 
     // create semaphore array
     let CS = CSarray::init(5);
-    // try to print the first chopstick
-    println! ( "{}", reader(CS.chopsticks[0]));
+    // print the counts of the chopsticks
+    let CSc0 = reader(&CS.chopsticks[0]);
+    let CSc1 = reader(&CS.chopsticks[1]);
+    let CSc2 = reader(&CS.chopsticks[2]);
+    let CSc3 = reader(&CS.chopsticks[3]);
+    let CSc4 = reader(&CS.chopsticks[4]);
+    println! ( " Counts: {} {} {} {} {}", CSc0,CSc1,CSc2,CSc3,CSc4);
 
 }
 
