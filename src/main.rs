@@ -112,6 +112,13 @@ fn main() {
     let ph4 = Philosopher::new("Locke",3);
     let ph5 = Philosopher::new("Descartes",4);
 
+     // For 'n' number of philosophers to make more robust
+    let number_of_philosophers = 5;
+    let ph = "ph".to_string();
+    for x in 0..number_of_philosophers {
+        let ph.push_str(&x) = Philosopher::new(ph.push_str(&x), &x);
+    }
+
     // create semaphore array
     let CS = CSarray::init(5);
     // print the counts of the chopsticks
@@ -121,6 +128,18 @@ fn main() {
     let CSc3 = reader(&CS.chopsticks[3]);
     let CSc4 = reader(&CS.chopsticks[4]);
     println! ( " Counts: {} {} {} {} {}", CSc0,CSc1,CSc2,CSc3,CSc4);
+
+    //create semaphore array for 'n' philosophers
+    let CS = CSarray::init(number_of_philosophers);
+    let CSc = "CSc".to_string();
+    for x in 0..number_of_philosophers {
+        let CSc.push_str(&x) = reader(&CS.chopsticks[&x]);
+    }
+
+    //Print the names and counts
+     for x in 0..number_of_philosophers {
+         println!("Name: {}. Count: {}", ph.push_str(&x), CSc.push_str(&x) );
+     }
 
 }
 
