@@ -93,19 +93,25 @@ impl CSarray {
 
 // Create a struct for a Philosopher
 struct Philosopher {
-    name: String,                           // String to contain the Philosopher's name
-    number: usize,                          // Number of philosopher
+    name: String,                                   // String to contain the Philosopher's name
+    number: usize,                                  // Number of philosopher
+
+    left_chopstick: usize,                          // Index for Left chopstick
+    right_chopstick: usize,                         // Index for Right chopstick
 }
 
 // Implementation of a Philosopher
 impl Philosopher {
 
     // Function to define the name for each philosopher
-    fn init(name: &str, number: usize) -> Philosopher {
+    fn init(name: &str, number: usize, chop_left: usize, chop_right: usize) -> Philosopher {
 
         Philosopher {
-            name: name.to_string(),         // Assign the name
-            number: number,                 // Assign number
+            name: name.to_string(),                 // Assign the name
+            number: number,                         // Assign number
+
+            left_chopstick: chop_left,              // Assign left chopstick
+            right_chopstick: chop_right,            // Assign right chopstick
         }
 
     }
@@ -150,15 +156,17 @@ fn reader(cs_lk: &Arc<Mutex<Chopstick>>) -> usize {
 //--------------------------------------------------------------------------------------------
 fn main() {
     
-    // Create five philosophers, per the original problem (change to threads)
-    let ph1 = Philosopher::init("Socrates", 0);
-    let ph2 = Philosopher::init("Plato", 1);
-    let ph3 = Philosopher::init("Kant", 2);
-    let ph4 = Philosopher::init("Locke", 3);
-    let ph5 = Philosopher::init("Descartes", 4);
-
     // Create a semaphore array
     let CS = CSarray::init(5);
+
+    // Create five philosophers, per the original problem (change to threads)
+    let ph1 = Philosopher::init("Socrates", 0, 0, 1);
+    let ph2 = Philosopher::init("Plato", 1, 1, 2);
+    let ph3 = Philosopher::init("Kant", 2, 2, 3);
+    let ph4 = Philosopher::init("Locke", 3, 3, 4);
+    let ph5 = Philosopher::init("Descartes", 4, 4, 0);
+
+    // [TODO] Make Descartes left-handed to avoid deadlock?
 
     // Print the counts of the chopsticks
     let CSc0 = reader(&CS.chopsticks[0]);
