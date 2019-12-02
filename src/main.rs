@@ -9,67 +9,87 @@
 //      Objective: simulate the Dining Philosopher's Problem using the concurrency features of
 //      Rust.     
 //
+//      With reference to https://doc.rust-lang.org/1.1.0/book/dining-philosophers.html
+//
+//--------------------------------------------------------------------------------------------
+
+
+// LIBRARIES
 //--------------------------------------------------------------------------------------------
 use std::{mem, thread};
 use std::sync::{Arc, Mutex};
 
+
 // STRUCTS
 //--------------------------------------------------------------------------------------------
 
-// Chopstick struct
+// Create a struct for a Chopstick
 struct Chopstick {
-     count: usize,                           // counting semaphore for individual chopstick
+     count: usize,                              // counting semaphore for individual chopstick
 }
+
 // Implementation of Chopstick
 impl Chopstick {
-    //Create a chopstick with a default count of 1
+    
+    // Create a chopstick with a default count of 1
     fn init() -> Chopstick {
         let mut count = 1;
         Chopstick{
             count: count,                       // create Chopstick with count of 1
         }
     }
-    // read count
+
+    // Read count
     fn read(&self) -> usize {
         let mut temp = self.count.clone();
         temp
     }
-    // increment count
+
+    // Increment count
     fn inc(&mut self) {
         self.count = self.count.wrapping_add(1);
     }
 }
-// implement copy trait
+
+// Implement copy trait
 impl Copy for Chopstick {}
-// implement clone trait
+
+// Implement clone trait
 impl Clone for Chopstick {
     fn clone(&self) -> Self {
         *self
     }
 }
 
-// Chopstick array
+
+// Create a struct for a Chopstick array
 struct CSarray {
-    chopsticks: Vec<Arc<Mutex<Chopstick>>>, //vector of chopstick semaphores
+    chopsticks: Vec<Arc<Mutex<Chopstick>>>,     //vector of chopstick semaphores
 }
+
 // Implementation of Chopstick array
 impl CSarray {
-    //creates an array of chopsticks of size (Capacity)
+
+    // Creates an array of chopsticks of size (Capacity)
     fn init(capacity: usize) -> CSarray {
-        // create chopstick array
+
+        // Create chopstick array
         let mut chopsticks: Vec<Arc<Mutex<Chopstick>>> = Vec::with_capacity(capacity);
+
         // fill chopstick array
         let mut cs = Chopstick::init();
         for _ in 0..capacity {
             let temp = Arc::new(Mutex::new(cs.clone()));
             chopsticks.push(temp);
         }
-        // create CSarray struct to return
+
+        // Create CSarray struct to return
         CSarray {
             chopsticks: chopsticks,
         }
     }
 }
+
 
 // Create a struct for a Philosopher
 struct Philosopher {
@@ -81,7 +101,7 @@ struct Philosopher {
 impl Philosopher {
 
     // Function to define the name for each philosopher
-    fn new(name: &str, number: usize) -> Philosopher {
+    fn init(name: &str, number: usize) -> Philosopher {
 
         Philosopher {
             name: name.to_string(),         // Assign the name
@@ -90,11 +110,36 @@ impl Philosopher {
 
     }
 
+    // Function to represent thinking
+    fn is_thinking(&self) {
+
+        // Print update message
+        println! ( "{} (#{}) is thinking.", self.name, self.number );
+
+    }
+
+    // Function to represent thinking
+    fn is_eating(&self) {
+
+        // Print update message
+        println! ( "{} (#{}) has started eating.", self.name, self.number );
+
+        // Sleep the thread
+        thread::sleep_ms(1000);
+
+        // Print update message
+        println! ( "{} (#{}) has finished eating.", self.name, self.number );
+    
+    }
+
 }
+
+
 // SUB FUNCTIONS
 //--------------------------------------------------------------------------------------------
 fn reader(cs_lk: &Arc<Mutex<Chopstick>>) -> usize {
-    // pass in protected chopstick, return count
+    
+    // Pass in protected chopstick and return count
     let mut cs = cs_lk.lock().unwrap();
     let count = cs.read();
     count
@@ -106,21 +151,22 @@ fn reader(cs_lk: &Arc<Mutex<Chopstick>>) -> usize {
 fn main() {
     
     // Create five philosophers, per the original problem (change to threads)
-    let ph1 = Philosopher::new("Socrates",0);
-    let ph2 = Philosopher::new("Plato",1);
-    let ph3 = Philosopher::new("Kant",2);
-    let ph4 = Philosopher::new("Locke",3);
-    let ph5 = Philosopher::new("Descartes",4);
+    let ph1 = Philosopher::init("Socrates", 0);
+    let ph2 = Philosopher::init("Plato", 1);
+    let ph3 = Philosopher::init("Kant", 2);
+    let ph4 = Philosopher::init("Locke", 3);
+    let ph5 = Philosopher::init("Descartes", 4);
 
-    // create semaphore array
+    // Create a semaphore array
     let CS = CSarray::init(5);
-    // print the counts of the chopsticks
+
+    // Print the counts of the chopsticks
     let CSc0 = reader(&CS.chopsticks[0]);
     let CSc1 = reader(&CS.chopsticks[1]);
     let CSc2 = reader(&CS.chopsticks[2]);
     let CSc3 = reader(&CS.chopsticks[3]);
     let CSc4 = reader(&CS.chopsticks[4]);
-    println! ( " Counts: {} {} {} {} {}", CSc0,CSc1,CSc2,CSc3,CSc4);
+    println! ( " Counts: {} {} {} {} {}", CSc0, CSc1, CSc2, CSc3, CSc4);
 
 }
 
