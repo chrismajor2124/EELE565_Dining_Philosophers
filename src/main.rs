@@ -25,7 +25,7 @@ use std::sync::{Arc, Mutex};
 
 // Create a struct for a Chopstick
 struct Chopstick {
-     count: usize,                              // counting semaphore for individual chopstick
+     used_count: usize,                              // counting semaphore for individual chopstick
 }
 
 // Implementation of Chopstick
@@ -33,21 +33,21 @@ impl Chopstick {
     
     // Create a chopstick with a default count of 1
     fn init() -> Chopstick {
-        let mut count = 1;
+        let mut count = 0;                     // set chopsticks to 0 uses
         Chopstick{
-            count: count,                       // create Chopstick with count of 1
+            used_count: count,                       // create Chopstick with count of 1
         }
     }
 
     // Read count
     fn read(&self) -> usize {
-        let mut temp = self.count.clone();
+        let mut temp = self.used_count.clone();
         temp
     }
 
     // Increment count
     fn inc(&mut self) {
-        self.count = self.count.wrapping_add(1);
+        self.used_count = self.used_count.wrapping_add(1);
     }
 }
 
@@ -143,10 +143,13 @@ impl Philosopher {
 
 // SUB FUNCTIONS
 //--------------------------------------------------------------------------------------------
-fn reader(cs_lk: &Arc<Mutex<Chopstick>>) -> usize {
+fn use_cs(cs_lk: &Arc<Mutex<Chopstick>>) -> usize {
     
-    // Pass in protected chopstick and return count
+    // Pass in protected chopstick
     let mut cs = cs_lk.lock().unwrap();
+    // inc count
+    cs.inc();
+    //return count
     let count = cs.read();
     count
 
@@ -169,11 +172,11 @@ fn main() {
     // [TODO] Make Descartes left-handed to avoid deadlock?
 
     // Print the counts of the chopsticks
-    let CSc0 = reader(&CS.chopsticks[0]);
-    let CSc1 = reader(&CS.chopsticks[1]);
-    let CSc2 = reader(&CS.chopsticks[2]);
-    let CSc3 = reader(&CS.chopsticks[3]);
-    let CSc4 = reader(&CS.chopsticks[4]);
+    let CSc0 = use_cs(&CS.chopsticks[0]);
+    let CSc1 = use_cs(&CS.chopsticks[1]);
+    let CSc2 = use_cs(&CS.chopsticks[2]);
+    let CSc3 = use_cs(&CS.chopsticks[3]);
+    let CSc4 = use_cs(&CS.chopsticks[4]);
     println! ( " Counts: {} {} {} {} {}", CSc0, CSc1, CSc2, CSc3, CSc4);
 
 }
