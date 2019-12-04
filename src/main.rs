@@ -74,6 +74,9 @@ impl CSarray {
     // Creates an array of chopsticks of size (Capacity)
     fn init(capacity: usize) -> CSarray {
 
+        // Print update message
+        println! ( "{} {} have been added to the table.\n", capacity.to_string().magenta(), "chopsticks".magenta());
+
         // Create chopstick array
         let mut chopsticks: Vec<Arc<Mutex<Chopstick>>> = Vec::with_capacity(capacity);
 
@@ -137,7 +140,7 @@ impl Philosopher {
         thread::sleep_ms(1000);
 
         // Print update message
-        println! ( "{} (#{}) has {}.", self.name, self.number, "finished eating".green() );
+        println! ( "{} (#{}) has {}.", self.name.to_string().blue(), self.number, "finished eating".green() );
     
     }
 
@@ -197,7 +200,12 @@ fn main() {
     let CSc2 = use_cs(&CS.chopsticks[2]);
     let CSc3 = use_cs(&CS.chopsticks[3]);
     let CSc4 = use_cs(&CS.chopsticks[4]);
-    println! ( "\nCounts: {} {} {} {} {}", CSc0, CSc1, CSc2, CSc3, CSc4);
+    println! ( "\nCounts: {} {} {} {} {}\n", CSc0, CSc1, CSc2, CSc3, CSc4);
+
+    // Test eating/thinking (remove when threads are implemented)
+    ph4.is_thinking();
+    ph4.is_eating();
+    ph4.is_thinking();
 
     // Print simulation begin message (END)
     print_status(1);
