@@ -72,7 +72,7 @@ impl Clone for Chopstick {
 
 // Create a struct for a Chopstick array
 struct CSarray {
-    chopsticks: Vec<Arc<Mutex<Chopstick>>>,     //vector of chopstick semaphores
+    chopsticks: Vec<Mutex<Chopstick>>,     //vector of chopstick semaphores
 }
 
 // Implementation of Chopstick array
@@ -85,12 +85,12 @@ impl CSarray {
         println! ( "{} {} have been added to the table.\n", capacity.to_string().magenta(), "chopsticks".magenta());
 
         // Create chopstick array
-        let mut chopsticks: Vec<Arc<Mutex<Chopstick>>> = Vec::with_capacity(capacity);
+        let mut chopsticks: Vec<Mutex<Chopstick>> = Vec::with_capacity(capacity);
 
         // fill chopstick array
-        let mut cs = Chopstick::init();
+        let cs = Chopstick::init();
         for _ in 0..capacity {
-            let temp = Arc::new(Mutex::new(cs.clone()));
+            let temp = Mutex::new(cs.clone());
             chopsticks.push(temp);
         }
 
@@ -158,12 +158,19 @@ impl Philosopher {
     
     }
 
+//    fn is_living(&self, CS: &'static CSarray) {
+//        thread::spawn(move || {
+//            self.is_thinking();
+//            self.is_eating(CS);
+//            self.is_thinking();
+//        });
+//    }
 }
 
 
 // SUB FUNCTIONS
 //--------------------------------------------------------------------------------------------
-fn use_cs(cs_lk: &Arc<Mutex<Chopstick>>) -> usize {
+fn use_cs(cs_lk: &Mutex<Chopstick>) -> usize {
     
     // Pass in protected chopstick
     let mut cs = cs_lk.lock().unwrap();
@@ -197,7 +204,7 @@ fn main() {
     print_status(0);
 
     // Create a semaphore array
-    let CS = CSarray::init(5);
+    let CS = Arc::new(CSarray::init(5));
 
     // Print the counts of the chopsticks
     let CSc0 = use_cs(&CS.chopsticks[0]);
@@ -212,17 +219,50 @@ fn main() {
     let ph2 = Philosopher::init("Plato", 1, 1, 2);
     let ph3 = Philosopher::init("Kant", 2, 2, 3);
     let ph4 = Philosopher::init("Locke", 3, 3, 4);
-    let ph5 = Philosopher::init("Descartes", 4, 4, 0);
+    let ph5 = Philosopher::init("Descartes", 4, 0, 4);
 
     // [TODO] Make Descartes left-handed to avoid deadlock?
 
 
-
+    let CS1 =Arc::clone(&CS);
+    let CS2 =Arc::clone(&CS);
+    let CS3 =Arc::clone(&CS);
+    let CS4 =Arc::clone(&CS);
+    let CS5 =Arc::clone(&CS);
     // Test eating/thinking (remove when threads are implemented)
     ph4.is_thinking();
     ph4.is_eating(&CS);
     ph4.is_thinking();
 
+    thread::spawn(move || {
+        ph1.is_thinking();
+        ph1.is_eating(&CS1);
+        ph1.is_thinking();
+    });
+    thread::spawn(move || {
+        ph2.is_thinking();
+        ph2.is_eating(&CS2);
+        ph2.is_thinking();
+    });
+    thread::spawn(move || {
+        ph3.is_thinking();
+        ph3.is_eating(&CS3);
+        ph3.is_thinking();
+    });
+    thread::spawn(move || {
+        ph4.is_thinking();
+        ph4.is_eating(&CS4);
+        ph4.is_thinking();
+    });
+    thread::spawn(move || {
+        ph5.is_thinking();
+        ph5.is_eating(&CS5);
+        ph5.is_thinking();
+    });
+
+    // Sleep the main function
+    thread::sleep(sleep_time+sleep_time+sleep_time);
+    //ph4.join().unwrap();
     // Print simulation begin message (END)
     print_status(1);
 }
