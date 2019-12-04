@@ -138,13 +138,16 @@ impl Philosopher {
         let mut _right_chopstick = CS.chopsticks[self.right_chopstick].lock().unwrap();
 
         // Print update message
-        println! ( "{} (#{}) has {}.", self.name.to_string().blue(), self.number, "started eating".green() );
+        println! ( "\n{} (#{}) has {}.", self.name.to_string().blue(), self.number, "started eating".green() );
+
+        println! ( " > {}  {}", "Left Chopstick:".white(), self.left_chopstick.to_string().magenta());
+        println! ( " > {} {}", "Right Chopstick:".white(), self.right_chopstick.to_string().magenta());
 
         // Sleep the thread
         thread::sleep_ms(1000);
 
         // Print update message
-        println! ( "{} (#{}) has {}.", self.name.to_string().blue(), self.number, "finished eating".green() );
+        println! ( "{} (#{}) has {}.\n", self.name.to_string().blue(), self.number, "finished eating".green() );
     
     }
 
@@ -208,7 +211,7 @@ fn main() {
 
     // Test eating/thinking (remove when threads are implemented)
     ph4.is_thinking();
-    ph4.is_eating();
+    ph4.is_eating(&CS);
     ph4.is_thinking();
 
     // Print simulation begin message (END)
