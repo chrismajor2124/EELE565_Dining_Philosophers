@@ -16,7 +16,7 @@
 
 // LIBRARIES
 //--------------------------------------------------------------------------------------------
-use std::{mem, thread, time, time::Duration};   // Library for mem, threads, and time
+use std::{thread, time, time::Duration};        // Library for mem, threads, and time
 use std::sync::{Arc, Mutex};                    // Library for mutexes
 use colored::*;                                 // Library for terminal color printing
 
@@ -25,7 +25,7 @@ use colored::*;                                 // Library for terminal color pr
 //--------------------------------------------------------------------------------------------
 
 // Define a segment of time for sleep()
-static sleep_time : Duration = time::Duration::from_millis(500);
+static SLEEP_TIME : Duration = time::Duration::from_millis(500);
 
 
 // STRUCTS
@@ -33,7 +33,7 @@ static sleep_time : Duration = time::Duration::from_millis(500);
 
 // Create a struct for a Chopstick
 struct Chopstick {
-     used_count: usize,                              // counting semaphore for individual chopstick
+     used_count: usize,                              // Counting semaphore for individual chopstick
 }
 
 // Implementation of Chopstick
@@ -41,9 +41,9 @@ impl Chopstick {
     
     // Create a chopstick with a default count of 1
     fn init() -> Chopstick {
-        let mut count = 0;                     // set chopsticks to 0 uses
+        let mut count = 0;                          // Set chopsticks to 0 uses
         Chopstick{
-            used_count: count,                       // create Chopstick with count of 1
+            used_count: count,                      // Create Chopstick with count of 1
         }
     }
 
@@ -72,7 +72,7 @@ impl Clone for Chopstick {
 
 // Create a struct for a Chopstick array
 struct CSarray {
-    chopsticks: Vec<Arc<Mutex<Chopstick>>>,     //vector of chopstick semaphores
+    chopsticks: Vec<Arc<Mutex<Chopstick>>>,         // Vector of chopstick semaphores
 }
 
 // Implementation of Chopstick array
@@ -87,7 +87,7 @@ impl CSarray {
         // Create chopstick array
         let mut chopsticks: Vec<Arc<Mutex<Chopstick>>> = Vec::with_capacity(capacity);
 
-        // fill chopstick array
+        // Fill chopstick array
         let mut cs = Chopstick::init();
         for _ in 0..capacity {
             let temp = Arc::new(Mutex::new(cs.clone()));
@@ -140,18 +140,17 @@ impl Philosopher {
     // Function to represent thinking
     fn is_eating(&self, CS: &CSarray) {
 
-        //let _left_chopstick = CSarray.chopsticks[self.left_chopstick].lock().unwrap();
+        // Assign chopsticks to philosopher
         let mut _left_chopstick = CS.chopsticks[self.left_chopstick].lock().unwrap();
         let mut _right_chopstick = CS.chopsticks[self.right_chopstick].lock().unwrap();
 
-        // Print update message
+        // Print update messages
         println! ( "\n{} (#{}) has {}.", self.name.to_string().blue(), self.number, "started eating".green() );
-
         println! ( " > {}  {}", "Left Chopstick:".white(), self.left_chopstick.to_string().magenta());
         println! ( " > {} {}", "Right Chopstick:".white(), self.right_chopstick.to_string().magenta());
 
         // Sleep the thread
-        thread::sleep(sleep_time);
+        thread::sleep(SLEEP_TIME);
 
         // Print update message
         println! ( "{} (#{}) has {}.\n", self.name.to_string().blue(), self.number, "finished eating".green() );
@@ -163,18 +162,23 @@ impl Philosopher {
 
 // SUB FUNCTIONS
 //--------------------------------------------------------------------------------------------
+
+// Function for a Philosopher to use a Chopstick
 fn use_cs(cs_lk: &Arc<Mutex<Chopstick>>) -> usize {
     
-    // Pass in protected chopstick
+    // Pass in a protected chopstick
     let mut cs = cs_lk.lock().unwrap();
-    // inc count
+
+    // Increment the count value
     cs.inc();
-    //return count
+
+    // Read and return count value
     let count = cs.read();
     count
 
 }
 
+// Function to print runtime status messages
 fn print_status(option: usize) {
 
     // Print simulation message
@@ -188,6 +192,7 @@ fn print_status(option: usize) {
 
     println! ("--------------------------------------------------------\n");
 }
+
 
 // MAIN FUNCTION
 //--------------------------------------------------------------------------------------------
@@ -208,20 +213,17 @@ fn main() {
     println! ( "Counts: {} {} {} {} {}\n", CSc0, CSc1, CSc2, CSc3, CSc4);
 
     // Create five philosophers, per the original problem (change to threads)
-    let ph1 = Philosopher::init("Socrates", 0, 0, 1);
-    let ph2 = Philosopher::init("Plato", 1, 1, 2);
-    let ph3 = Philosopher::init("Kant", 2, 2, 3);
-    let ph4 = Philosopher::init("Locke", 3, 3, 4);
-    let ph5 = Philosopher::init("Descartes", 4, 4, 0);
-
-    // [TODO] Make Descartes left-handed to avoid deadlock?
-
-
+    // ph5 is left-handed as a deadlock mitigation strategy
+    let _ph1 = Philosopher::init("Socrates", 0, 0, 1);
+    let _ph2 = Philosopher::init("Plato", 1, 1, 2);
+    let _ph3 = Philosopher::init("Kant", 2, 2, 3);
+    let _ph4 = Philosopher::init("Locke", 3, 3, 4);
+    let _ph5 = Philosopher::init("Descartes", 4, 0, 4);
 
     // Test eating/thinking (remove when threads are implemented)
-    ph4.is_thinking();
-    ph4.is_eating(&CS);
-    ph4.is_thinking();
+    _ph4.is_thinking();
+    _ph4.is_eating(&CS);
+    _ph4.is_thinking();
 
     // Print simulation begin message (END)
     print_status(1);
