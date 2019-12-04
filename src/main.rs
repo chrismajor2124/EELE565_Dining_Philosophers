@@ -16,9 +16,16 @@
 
 // LIBRARIES
 //--------------------------------------------------------------------------------------------
-use std::{mem, thread};                         // Library for threads
+use std::{mem, thread, time, time::Duration};   // Library for mem, threads, and time
 use std::sync::{Arc, Mutex};                    // Library for mutexes
 use colored::*;                                 // Library for terminal color printing
+
+
+// GLOBAL VARIABLES
+//--------------------------------------------------------------------------------------------
+
+// Define a segment of time for sleep()
+static sleep_time : Duration = time::Duration::from_millis(500);
 
 
 // STRUCTS
@@ -144,7 +151,7 @@ impl Philosopher {
         println! ( " > {} {}", "Right Chopstick:".white(), self.right_chopstick.to_string().magenta());
 
         // Sleep the thread
-        thread::sleep_ms(1000);
+        thread::sleep(sleep_time);
 
         // Print update message
         println! ( "{} (#{}) has {}.\n", self.name.to_string().blue(), self.number, "finished eating".green() );
@@ -192,6 +199,14 @@ fn main() {
     // Create a semaphore array
     let CS = CSarray::init(5);
 
+    // Print the counts of the chopsticks
+    let CSc0 = use_cs(&CS.chopsticks[0]);
+    let CSc1 = use_cs(&CS.chopsticks[1]);
+    let CSc2 = use_cs(&CS.chopsticks[2]);
+    let CSc3 = use_cs(&CS.chopsticks[3]);
+    let CSc4 = use_cs(&CS.chopsticks[4]);
+    println! ( "Counts: {} {} {} {} {}\n", CSc0, CSc1, CSc2, CSc3, CSc4);
+
     // Create five philosophers, per the original problem (change to threads)
     let ph1 = Philosopher::init("Socrates", 0, 0, 1);
     let ph2 = Philosopher::init("Plato", 1, 1, 2);
@@ -201,13 +216,7 @@ fn main() {
 
     // [TODO] Make Descartes left-handed to avoid deadlock?
 
-    // Print the counts of the chopsticks
-    let CSc0 = use_cs(&CS.chopsticks[0]);
-    let CSc1 = use_cs(&CS.chopsticks[1]);
-    let CSc2 = use_cs(&CS.chopsticks[2]);
-    let CSc3 = use_cs(&CS.chopsticks[3]);
-    let CSc4 = use_cs(&CS.chopsticks[4]);
-    println! ( "\nCounts: {} {} {} {} {}\n", CSc0, CSc1, CSc2, CSc3, CSc4);
+
 
     // Test eating/thinking (remove when threads are implemented)
     ph4.is_thinking();
