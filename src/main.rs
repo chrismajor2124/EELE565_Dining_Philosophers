@@ -192,11 +192,11 @@ fn main() {
     // [TODO] Make Descartes left-handed to avoid deadlock?
 
     // Print the counts of the chopsticks
-    let CSc0 = reader(&CS.chopsticks[0]);
-    let CSc1 = reader(&CS.chopsticks[1]);
-    let CSc2 = reader(&CS.chopsticks[2]);
-    let CSc3 = reader(&CS.chopsticks[3]);
-    let CSc4 = reader(&CS.chopsticks[4]);
+    let CSc0 = use_cs(&CS.chopsticks[0]);
+    let CSc1 = use_cs(&CS.chopsticks[1]);
+    let CSc2 = use_cs(&CS.chopsticks[2]);
+    let CSc3 = use_cs(&CS.chopsticks[3]);
+    let CSc4 = use_cs(&CS.chopsticks[4]);
     println! ( "\nCounts: {} {} {} {} {}", CSc0, CSc1, CSc2, CSc3, CSc4);
 
     // Print simulation begin message (END)
