@@ -131,7 +131,11 @@ impl Philosopher {
     }
 
     // Function to represent thinking
-    fn is_eating(&self) {
+    fn is_eating(&self, CS: &CSarray) {
+
+        //let _left_chopstick = CSarray.chopsticks[self.left_chopstick].lock().unwrap();
+        let mut _left_chopstick = CS.chopsticks[self.left_chopstick].lock().unwrap();
+        let mut _right_chopstick = CS.chopsticks[self.right_chopstick].lock().unwrap();
 
         // Print update message
         println! ( "{} (#{}) has {}.", self.name.to_string().blue(), self.number, "started eating".green() );
