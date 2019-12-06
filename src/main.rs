@@ -164,18 +164,13 @@ impl Philosopher {
 //--------------------------------------------------------------------------------------------
 
 // Function for a Philosopher to use a Chopstick
-fn use_cs(cs_lk: &Arc<Mutex<Chopstick>>) -> usize {
+fn update_eatC(counts_lk: &Arc<Mutex<Vec<i32>>>, index: usize)  {
     
-    // Pass in a protected chopstick
-    let mut cs = cs_lk.lock().unwrap();
-
-    // Increment the count value
-    cs.inc();
+    // Pass in a protected counts
+    let mut counts = counts_lk.lock().unwrap();
 
     // Read and return count value
-    let count = cs.read();
-    count
-
+    counts[index] = counts[index]+1;
 }
 
 // Function to print runtime status messages
@@ -188,30 +183,46 @@ fn print_status(option: usize) {
         0 => println! ("BEGIN: DINING PHILOSOPHER'S PROBLEM"),
         1 => println! ("END: DINING PHILOSOPHER'S PROBLEM"),
         2 => println! ("THREADS START"),
+        3 => println! ("THREADS REPORT"),
         _ => println! ("{}", "ERROR!".red()),
     };
 
     println! ("--------------------------------------------------------\n");
 }
 
+// Displays if the philosophers ate or not
+fn philosopher_upate(count_vec: &Arc<Mutex<Vec<i32>>>) {
+
+    // Print update
+    println! ("");
+
+    // Pass in a protected counts
+    let mut counts = count_vec.lock().unwrap();
+
+    // If the values of counts are non-zero, all philosophers have eaten
+    for pos in 0..counts.len() {
+
+        match counts[pos] {
+            0 => println!("{} Philosopher #{} failed to eat ({} times)", "ERROR:".red(), pos, counts[pos]),
+            _ => println!("{} Philosopher #{} ate successfully ({} times)", "SUCCESS:".green(), pos, counts[pos])
+
+        }
+    }
+}
 
 // MAIN FUNCTION
 //--------------------------------------------------------------------------------------------
 fn main() {
-    
+
+    // Create vectors
+    let mut vec = vec![0;5];
+    let mut counts = Arc::new(Mutex::new(vec));
+
     // Print simulation begin message (BEGIN)
     print_status(0);
 
     // Create a semaphore array
     let CS = Arc::new(CSarray::init(5));
-
-    // // Print the counts of the chopsticks
-    // let CSc0 = use_cs(&CS.chopsticks[0]);
-    // let CSc1 = use_cs(&CS.chopsticks[1]);
-    // let CSc2 = use_cs(&CS.chopsticks[2]);
-    // let CSc3 = use_cs(&CS.chopsticks[3]);
-    // let CSc4 = use_cs(&CS.chopsticks[4]);
-    // println! ( "Counts: {} {} {} {} {}\n", CSc0, CSc1, CSc2, CSc3, CSc4);
 
     // Create five philosophers, per the original problem (change to threads)
     // ph5 is left-handed as a deadlock mitigation strategy
@@ -228,49 +239,77 @@ fn main() {
     let CS4 =Arc::clone(&CS);
     let CS5 =Arc::clone(&CS);
 
+    //create vector of counts to tell how many times each philosopher has eaten
+    let mut vec = vec![0;5];
+    let mut counts = Arc::new(Mutex::new(vec));
+    //clone count vector to pass into threads
+    let C1 =Arc::clone(&counts);
+    let C2 =Arc::clone(&counts);
+    let C3 =Arc::clone(&counts);
+    let C4 =Arc::clone(&counts);
+    let C5 =Arc::clone(&counts);
+
     // Print simulation begin message (THREADS)
     print_status(2);
 
     // Socrates (ph1) starts his thread
     thread::spawn(move || {
-        ph1.is_thinking();
-        ph1.is_eating(&CS1);
-        ph1.is_thinking();
+        for i in 0..10 {
+            ph1.is_thinking();
+            ph1.is_eating(&CS1);
+            update_eatC(&C1,ph1.number);
+            ph1.is_thinking();
+        }
     });
 
     // Plato (ph2) starts his thread
     thread::spawn(move || {
-        ph2.is_thinking();
-        ph2.is_eating(&CS2);
-        ph2.is_thinking();
+        for i in 0..10 {
+            ph2.is_thinking();
+            ph2.is_eating(&CS2);
+            update_eatC(&C2,ph2.number);
+            ph2.is_thinking();
+        }
     });
 
     // Kant (ph3) starts his thread
     thread::spawn(move || {
-        ph3.is_thinking();
-        ph3.is_eating(&CS3);
-        ph3.is_thinking();
+        for i in 0..10 {
+            ph3.is_thinking();
+            ph3.is_eating(&CS3);
+            update_eatC(&C3,ph3.number);
+            ph3.is_thinking();
+        }
     });
 
     // Locke (ph4) starts his thread
     thread::spawn(move || {
-        ph4.is_thinking();
-        ph4.is_eating(&CS4);
-        ph4.is_thinking();
+        for i in 0..10 {
+            ph4.is_thinking();
+            ph4.is_eating(&CS4);
+            update_eatC(&C4,ph4.number);
+            ph4.is_thinking();
+        }
     });
 
     // Descares (ph5) starts his thread
     thread::spawn(move || {
-        ph5.is_thinking();
-        ph5.is_eating(&CS5);
-        ph5.is_thinking();
+        for i in 0..10 {
+            ph5.is_thinking();
+            ph5.is_eating(&CS5);
+            update_eatC(&C5,ph5.number);
+            ph5.is_thinking();
+        }
     });
 
     // Sleep the main function
-    thread::sleep(5 * sleep_time);
-    //ph4.join().unwrap();
+    thread::sleep(30 * sleep_time);
 
-    // [TODO] Report on philosopher activity
+    // Print simulation begin message (END)
+    print_status(3);
+
+    // Report on philosopher activity
+    philosopher_upate(&counts);
 
     // Print simulation begin message (END)
     print_status(1);
