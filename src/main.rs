@@ -146,8 +146,8 @@ impl Philosopher {
 
         // Print update messages
         println! ( "\n{} (#{}) has {}.", self.name.to_string().blue(), self.number, "started eating".green() );
-        println! ( " > {}  {}", "Left Chopstick:".white(), self.left_chopstick.to_string().magenta());
-        println! ( " > {} {}", "Right Chopstick:".white(), self.right_chopstick.to_string().magenta());
+        println! ( " > {}  {} ({})", "Left Chopstick acquired:".white(), self.left_chopstick.to_string().magenta(), self.number.to_string().blue());
+        println! ( " > {} {} ({})", "Right Chopstick acquired:".white(), self.right_chopstick.to_string().magenta(), self.number.to_string().blue());
 
         // Sleep the thread
         thread::sleep(sleep_time);
@@ -187,6 +187,7 @@ fn print_status(option: usize) {
     match option {
         0 => println! ("BEGIN: DINING PHILOSOPHER'S PROBLEM"),
         1 => println! ("END: DINING PHILOSOPHER'S PROBLEM"),
+        2 => println! ("THREADS START"),
         _ => println! ("{}", "ERROR!".red()),
     };
 
@@ -204,13 +205,13 @@ fn main() {
     // Create a semaphore array
     let CS = Arc::new(CSarray::init(5));
 
-    // Print the counts of the chopsticks
-    let CSc0 = use_cs(&CS.chopsticks[0]);
-    let CSc1 = use_cs(&CS.chopsticks[1]);
-    let CSc2 = use_cs(&CS.chopsticks[2]);
-    let CSc3 = use_cs(&CS.chopsticks[3]);
-    let CSc4 = use_cs(&CS.chopsticks[4]);
-    println! ( "Counts: {} {} {} {} {}\n", CSc0, CSc1, CSc2, CSc3, CSc4);
+    // // Print the counts of the chopsticks
+    // let CSc0 = use_cs(&CS.chopsticks[0]);
+    // let CSc1 = use_cs(&CS.chopsticks[1]);
+    // let CSc2 = use_cs(&CS.chopsticks[2]);
+    // let CSc3 = use_cs(&CS.chopsticks[3]);
+    // let CSc4 = use_cs(&CS.chopsticks[4]);
+    // println! ( "Counts: {} {} {} {} {}\n", CSc0, CSc1, CSc2, CSc3, CSc4);
 
     // Create five philosophers, per the original problem (change to threads)
     // ph5 is left-handed as a deadlock mitigation strategy
@@ -220,38 +221,45 @@ fn main() {
     let ph4 = Philosopher::init("Locke", 3, 3, 4);
     let ph5 = Philosopher::init("Descartes", 4, 0, 4);
 
-
+    // Print the counts of the chopsticks
     let CS1 =Arc::clone(&CS);
     let CS2 =Arc::clone(&CS);
     let CS3 =Arc::clone(&CS);
     let CS4 =Arc::clone(&CS);
     let CS5 =Arc::clone(&CS);
 
-    // Test eating/thinking (remove when threads are implemented)
-    ph4.is_thinking();
-    ph4.is_eating(&CS);
-    ph4.is_thinking();
+    // Print simulation begin message (THREADS)
+    print_status(2);
 
+    // Socrates (ph1) starts his thread
     thread::spawn(move || {
         ph1.is_thinking();
         ph1.is_eating(&CS1);
         ph1.is_thinking();
     });
+
+    // Plato (ph2) starts his thread
     thread::spawn(move || {
         ph2.is_thinking();
         ph2.is_eating(&CS2);
         ph2.is_thinking();
     });
+
+    // Kant (ph3) starts his thread
     thread::spawn(move || {
         ph3.is_thinking();
         ph3.is_eating(&CS3);
         ph3.is_thinking();
     });
+
+    // Locke (ph4) starts his thread
     thread::spawn(move || {
         ph4.is_thinking();
         ph4.is_eating(&CS4);
         ph4.is_thinking();
     });
+
+    // Descares (ph5) starts his thread
     thread::spawn(move || {
         ph5.is_thinking();
         ph5.is_eating(&CS5);
@@ -259,8 +267,11 @@ fn main() {
     });
 
     // Sleep the main function
-    thread::sleep(sleep_time+sleep_time+sleep_time);
+    thread::sleep(5 * sleep_time);
     //ph4.join().unwrap();
+
+    // [TODO] Report on philosopher activity
+
     // Print simulation begin message (END)
     print_status(1);
 }
