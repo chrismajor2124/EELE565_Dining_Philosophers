@@ -154,6 +154,8 @@ impl Philosopher {
 
         // Print update message
         println! ( "{} (#{}) has {}.\n", self.name.to_string().blue(), self.number, "finished eating".green() );
+
+        // Update thread count
     
     }
 
@@ -183,34 +185,46 @@ fn print_status(option: usize) {
         0 => println! ("BEGIN: DINING PHILOSOPHER'S PROBLEM"),
         1 => println! ("END: DINING PHILOSOPHER'S PROBLEM"),
         2 => println! ("THREADS START"),
+        3 => println! ("THREADS REPORT"),
         _ => println! ("{}", "ERROR!".red()),
     };
 
     println! ("--------------------------------------------------------\n");
 }
 
+// Displays if the philosophers ate or not
+fn philosopher_upate(count_vec: &Arc<Mutex<Vec<i32>>>) {
+
+    // Print update
+    println! ("");
+
+    // Pass in a protected counts
+    let mut counts = count_vec.lock().unwrap();
+
+    // If the values of counts are non-zero, all philosophers have eaten
+    for pos in 0..counts.len() {
+        
+        match counts[pos] {
+            0 => println!("{} Philosopher #{} failed to eat ({} times)", "ERROR:".red(), pos, counts[pos]),
+            _ => println!("{} Philosopher #{} ate successfully ({} times)", "SUCCESS:".green(), pos, counts[pos])
+
+        }
+    }
+}
 
 // MAIN FUNCTION
 //--------------------------------------------------------------------------------------------
 fn main() {
+
+    // Create vectors
     let mut vec = vec![0;5];
     let mut counts = Arc::new(Mutex::new(vec));
-
-
 
     // Print simulation begin message (BEGIN)
     print_status(0);
 
     // Create a semaphore array
     let CS = Arc::new(CSarray::init(5));
-
-    // // Print the counts of the chopsticks
-    // let CSc0 = use_cs(&CS.chopsticks[0]);
-    // let CSc1 = use_cs(&CS.chopsticks[1]);
-    // let CSc2 = use_cs(&CS.chopsticks[2]);
-    // let CSc3 = use_cs(&CS.chopsticks[3]);
-    // let CSc4 = use_cs(&CS.chopsticks[4]);
-    // println! ( "Counts: {} {} {} {} {}\n", CSc0, CSc1, CSc2, CSc3, CSc4);
 
     // Create five philosophers, per the original problem (change to threads)
     // ph5 is left-handed as a deadlock mitigation strategy
@@ -276,10 +290,13 @@ fn main() {
     });
 
     // Sleep the main function
-    thread::sleep(10 * sleep_time);
-    //ph4.join().unwrap();
+    thread::sleep(20 * sleep_time);
 
-    // [TODO] Report on philosopher activity
+    // Print simulation begin message (END)
+    print_status(3);
+
+    // Report on philosopher activity
+    philosopher_upate(&counts);
 
     // Print simulation begin message (END)
     print_status(1);
