@@ -164,18 +164,13 @@ impl Philosopher {
 //--------------------------------------------------------------------------------------------
 
 // Function for a Philosopher to use a Chopstick
-fn use_cs(cs_lk: &Arc<Mutex<Chopstick>>) -> usize {
+fn update_eatC(counts_lk: &Arc<Mutex<Vec<i32>>>, index: usize)  {
     
-    // Pass in a protected chopstick
-    let mut cs = cs_lk.lock().unwrap();
-
-    // Increment the count value
-    cs.inc();
+    // Pass in a protected counts
+    let mut counts = counts_lk.lock().unwrap();
 
     // Read and return count value
-    let count = cs.read();
-    count
-
+    counts[index] = counts[index]+1;
 }
 
 // Function to print runtime status messages
@@ -198,7 +193,11 @@ fn print_status(option: usize) {
 // MAIN FUNCTION
 //--------------------------------------------------------------------------------------------
 fn main() {
-    
+    let mut vec = vec![0;5];
+    let mut counts = Arc::new(Mutex::new(vec));
+
+
+
     // Print simulation begin message (BEGIN)
     print_status(0);
 
@@ -233,41 +232,51 @@ fn main() {
 
     // Socrates (ph1) starts his thread
     thread::spawn(move || {
-        ph1.is_thinking();
-        ph1.is_eating(&CS1);
-        ph1.is_thinking();
+        for i in 0..10 {
+            ph1.is_thinking();
+            ph1.is_eating(&CS1);
+            ph1.is_thinking();
+        }
     });
 
     // Plato (ph2) starts his thread
     thread::spawn(move || {
-        ph2.is_thinking();
-        ph2.is_eating(&CS2);
-        ph2.is_thinking();
+        for i in 0..10 {
+            ph2.is_thinking();
+            ph2.is_eating(&CS2);
+            ph2.is_thinking();
+        }
     });
 
     // Kant (ph3) starts his thread
     thread::spawn(move || {
-        ph3.is_thinking();
-        ph3.is_eating(&CS3);
-        ph3.is_thinking();
+        for i in 0..10 {
+            ph3.is_thinking();
+            ph3.is_eating(&CS3);
+            ph3.is_thinking();
+        }
     });
 
     // Locke (ph4) starts his thread
     thread::spawn(move || {
-        ph4.is_thinking();
-        ph4.is_eating(&CS4);
-        ph4.is_thinking();
+        for i in 0..10 {
+            ph4.is_thinking();
+            ph4.is_eating(&CS4);
+            ph4.is_thinking();
+        }
     });
 
     // Descares (ph5) starts his thread
     thread::spawn(move || {
-        ph5.is_thinking();
-        ph5.is_eating(&CS5);
-        ph5.is_thinking();
+        for i in 0..10 {
+            ph5.is_thinking();
+            ph5.is_eating(&CS5);
+            ph5.is_thinking();
+        }
     });
 
     // Sleep the main function
-    thread::sleep(5 * sleep_time);
+    thread::sleep(10 * sleep_time);
     //ph4.join().unwrap();
 
     // [TODO] Report on philosopher activity
