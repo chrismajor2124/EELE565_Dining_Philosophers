@@ -19,3 +19,6 @@ cargo run
 ```
 
 The output will display in the terminal of the IDE you are using (VS Code, JetBrains, etc.)
+
+## Demo
+Please refer to the demo video included in the images folder.
