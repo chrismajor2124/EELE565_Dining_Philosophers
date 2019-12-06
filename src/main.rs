@@ -154,8 +154,6 @@ impl Philosopher {
 
         // Print update message
         println! ( "{} (#{}) has {}.\n", self.name.to_string().blue(), self.number, "finished eating".green() );
-
-        // Update thread count
     
     }
 
@@ -203,7 +201,7 @@ fn philosopher_upate(count_vec: &Arc<Mutex<Vec<i32>>>) {
 
     // If the values of counts are non-zero, all philosophers have eaten
     for pos in 0..counts.len() {
-        
+
         match counts[pos] {
             0 => println!("{} Philosopher #{} failed to eat ({} times)", "ERROR:".red(), pos, counts[pos]),
             _ => println!("{} Philosopher #{} ate successfully ({} times)", "SUCCESS:".green(), pos, counts[pos])
@@ -241,6 +239,16 @@ fn main() {
     let CS4 =Arc::clone(&CS);
     let CS5 =Arc::clone(&CS);
 
+    //create vector of counts to tell how many times each philosopher has eaten
+    let mut vec = vec![0;5];
+    let mut counts = Arc::new(Mutex::new(vec));
+    //clone count vector to pass into threads
+    let C1 =Arc::clone(&counts);
+    let C2 =Arc::clone(&counts);
+    let C3 =Arc::clone(&counts);
+    let C4 =Arc::clone(&counts);
+    let C5 =Arc::clone(&counts);
+
     // Print simulation begin message (THREADS)
     print_status(2);
 
@@ -249,6 +257,7 @@ fn main() {
         for i in 0..10 {
             ph1.is_thinking();
             ph1.is_eating(&CS1);
+            update_eatC(&C1,ph1.number);
             ph1.is_thinking();
         }
     });
@@ -258,6 +267,7 @@ fn main() {
         for i in 0..10 {
             ph2.is_thinking();
             ph2.is_eating(&CS2);
+            update_eatC(&C2,ph2.number);
             ph2.is_thinking();
         }
     });
@@ -267,6 +277,7 @@ fn main() {
         for i in 0..10 {
             ph3.is_thinking();
             ph3.is_eating(&CS3);
+            update_eatC(&C3,ph3.number);
             ph3.is_thinking();
         }
     });
@@ -276,6 +287,7 @@ fn main() {
         for i in 0..10 {
             ph4.is_thinking();
             ph4.is_eating(&CS4);
+            update_eatC(&C4,ph4.number);
             ph4.is_thinking();
         }
     });
@@ -285,12 +297,13 @@ fn main() {
         for i in 0..10 {
             ph5.is_thinking();
             ph5.is_eating(&CS5);
+            update_eatC(&C5,ph5.number);
             ph5.is_thinking();
         }
     });
 
     // Sleep the main function
-    thread::sleep(20 * sleep_time);
+    thread::sleep(30 * sleep_time);
 
     // Print simulation begin message (END)
     print_status(3);
